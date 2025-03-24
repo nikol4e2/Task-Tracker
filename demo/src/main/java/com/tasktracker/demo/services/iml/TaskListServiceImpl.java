@@ -6,8 +6,7 @@ import com.tasktracker.demo.services.TaskListService;
 import org.springframework.stereotype.Service;
 
 import java.time.LocalDateTime;
-import java.util.List;
-import java.util.Locale;
+import java.util.*;
 
 @Service
 public class TaskListServiceImpl implements TaskListService {
@@ -35,5 +34,35 @@ public class TaskListServiceImpl implements TaskListService {
         }
         LocalDateTime now = LocalDateTime.now();
         return taskListRepository.save(new TaskList(null,taskList.getTitle(),taskList.getDescription(),null,now,now));
+    }
+
+    @Override
+    public Optional<TaskList> getTaskList(UUID id) {
+        return taskListRepository.findById(id);
+    }
+
+    @Override
+    public TaskList updateTaksList(UUID id, TaskList taskList) {
+        if(taskList.getId() == null)
+        {
+            throw new IllegalArgumentException("Task list does not have an ID!");
+        }
+
+        if(!Objects.equals(taskList.getId(), id))
+        {
+            throw new IllegalArgumentException("Attempting to change the ID, this is not permitted!");
+        }
+
+        TaskList existingTaskList = taskListRepository.findById(id).orElseThrow(()-> new IllegalArgumentException("Task list does not exist!"));
+
+        existingTaskList.setTitle(taskList.getTitle());
+        existingTaskList.setDescription(taskList.getDescription());
+        existingTaskList.setUpdated(LocalDateTime.now());
+        return taskListRepository.save(existingTaskList);
+    }
+
+    @Override
+    public void deleteTaksList(UUID id) {
+        taskListRepository.deleteById(id);
     }
 }

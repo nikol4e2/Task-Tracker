@@ -9,6 +9,8 @@ import com.tasktracker.demo.services.TaskListService;
 import org.springframework.web.bind.annotation.*;
 
 import java.util.List;
+import java.util.Optional;
+import java.util.UUID;
 import java.util.stream.Collectors;
 
 @RestController
@@ -34,5 +36,21 @@ public class TaskListController {
                 taskListMapper.fromDto(taskListDto)
         );
         return taskListMapper.toDto(createdTaskList);
+    }
+
+    @GetMapping(path = "/{id}")
+    public Optional<TaskListDto> getTaskList(@PathVariable UUID id) {
+        return taskListService.getTaskList(id).map(taskListMapper::toDto);
+    }
+
+    @PutMapping(path = "/{id}")
+    public TaskListDto updateTaskList(@PathVariable UUID id, @RequestBody TaskListDto taskListDto) {
+        TaskList updateTaskList =taskListService.updateTaksList(id, taskListMapper.fromDto(taskListDto));
+        return taskListMapper.toDto(updateTaskList);
+    }
+
+    @DeleteMapping(path = "/{id}")
+    public void deleteTaskList(@PathVariable UUID id) {
+        taskListService.deleteTaksList(id);
     }
 }
